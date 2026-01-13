@@ -1,0 +1,180 @@
+version: '3.8'
+
+services:
+  # Banking Notification Service
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+
+      # PostgreSQL (Notification History)
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: banking_notifications
+      DB_USER: notification_user
+      DB_PASSWORD: notification_password_dev
+      DB_SSL: "false"
+
+      # MongoDB (User Preferences)
+      MONGO_URL: mongodb://mongo:27017/banking_notifications
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis_password_dev
+      REDIS_TLS: "false"
+
+      # Kafka
+      KAFKA_BROKERS: kafka:9092
+
+      # External Services (disabled for development)
+      TWILIO_ENABLED: "false"
+      SENDGRID_ENABLED: "false"
+      FIREBASE_ENABLED: "false"
+
+      # WebSocket Gateway
+      WEBSOCKET_GATEWAY_URL: http://websocket-gateway:3001
+      WEBSOCKET_GATEWAY_API_KEY: dev_api_key
+
+      # Security
+      FIELD_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef
+      INTERNAL_API_KEY: dev_internal_api_key
+
+      # Logging
+      LOG_LEVEL: debug
+      LOG_FORMAT: pretty
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - banking-network
+    volumes:
+      - ./logs:/app/logs
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: banking_notifications
+      POSTGRES_USER: notification_user
+      POSTGRES_PASSWORD: notification_password_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U notification_user -d banking_notifications"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - banking-network
+
+  # MongoDB Database
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - banking-network
+
+  # Redis for queues and rate limiting
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    command: redis-server --requirepass redis_password_dev --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_password_dev", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - banking-network
+
+  # Zookeeper for Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+    networks:
+      - banking-network
+
+  # Kafka for event publishing
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9093:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      - zookeeper
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - banking-network
+
+  # Kafka UI for development
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8081:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - banking-network
+
+  # Mongo Express for development
+  mongo-express:
+    image: mongo-express:latest
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    depends_on:
+      - mongo
+    networks:
+      - banking-network
+
+volumes:
+  postgres_data:
+  mongo_data:
+  redis_data:
+  zookeeper_data:
+  kafka_data:
+
+networks:
+  banking-network:
+    driver: bridge
