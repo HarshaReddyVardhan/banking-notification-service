@@ -27,10 +27,27 @@ spec:
         prometheus.io/path: "/metrics"
     spec:
       serviceAccountName: notification-service
+
+      # Pod-level security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+
       containers:
         - name: notification-service
           image: banking/notification-service:latest
           imagePullPolicy: Always
+
+          # Container-level security context
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
           ports:
             - name: http
               containerPort: 3003
@@ -178,10 +195,18 @@ spec:
             - name: firebase-credentials
               mountPath: /secrets/firebase
               readOnly: true
+            - name: tmp
+              mountPath: /tmp
+            - name: logs
+              mountPath: /app/logs
       volumes:
         - name: firebase-credentials
           secret:
             secretName: firebase-service-account
+        - name: tmp
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
