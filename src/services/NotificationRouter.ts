@@ -6,7 +6,6 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { config } from '../config/config';
 import { logger, logNotification } from '../utils/logger';
 import {
     NotificationPayload,

@@ -6,9 +6,9 @@
  */
 
 import Twilio from 'twilio';
-import { config } from '../../config/config';
-import { logger, logChannelDelivery } from '../../utils/logger';
-import { SMSPayload, DeliveryResult, NotificationPayload } from '../../types';
+import { config } from '../config/config';
+import { logger, logChannelDelivery } from '../utils/logger';
+import { SMSPayload, DeliveryResult, NotificationPayload } from '../types';
 
 export class SMSHandler {
     private client: Twilio.Twilio | null = null;

@@ -6,9 +6,9 @@
  */
 
 import admin from 'firebase-admin';
-import { config } from '../../config/config';
-import { logger, logChannelDelivery } from '../../utils/logger';
-import { PushPayload, DeliveryResult, NotificationPayload } from '../../types';
+import { config } from '../config/config';
+import { logger, logChannelDelivery } from '../utils/logger';
+import { PushPayload, DeliveryResult, NotificationPayload } from '../types';
 
 interface DeviceToken {
     token: string;

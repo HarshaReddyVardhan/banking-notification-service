@@ -11,7 +11,6 @@ import { logger } from '../utils/logger';
 import { UserPreferences, NotificationEvent } from '../models';
 import { emailHandler } from '../channels';
 import { NotificationPayload, DigestFrequency } from '../types';
-import { Op } from 'sequelize';
 
 interface DigestEntry {
     notificationId: string;
@@ -200,6 +199,8 @@ export class DigestService {
      * Send digest email for a user
      */
     private async sendDigestForUser(userId: string, frequency: DigestFrequency): Promise<void> {
+        if (frequency === 'immediate') return;
+
         const key = this.getDigestKey(userId, frequency);
 
         // Get all pending notifications
@@ -239,7 +240,7 @@ export class DigestService {
             email,
             undefined, // toName
             payloads,
-            frequency
+            frequency as 'hourly' | 'daily' | 'weekly'
         );
 
         if (result.status === 'sent') {

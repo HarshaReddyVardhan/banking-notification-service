@@ -8,7 +8,7 @@
 import { Kafka, Consumer, logLevel } from 'kafkajs';
 import { config } from '../config/config';
 import { logger, logKafkaMessage } from '../utils/logger';
-import { IncomingEvent, NotificationEventType, NotificationPriority } from '../types';
+import { IncomingEvent } from '../types';
 import { DeadLetterQueue } from '../models';
 import { notificationRouter, NotificationRequest } from './NotificationRouter';
 

@@ -5,8 +5,8 @@
  */
 
 import mongoose from 'mongoose';
-import { config } from '../config/config';
-import { logger } from '../utils/logger';
+import { config } from '../../config/config';
+import { logger } from '../../utils/logger';
 
 /**
  * Initialize MongoDB connection

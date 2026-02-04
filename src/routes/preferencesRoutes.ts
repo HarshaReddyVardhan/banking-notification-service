@@ -127,7 +127,7 @@ router.put(
         // Update notification types
         if (updates.notificationTypes) {
             for (const [eventType, prefs] of Object.entries(updates.notificationTypes)) {
-                preferences.notificationTypes.set(eventType as unknown as string, prefs as {
+                preferences.notificationTypes.set(eventType as any, prefs as {
                     enabled: boolean;
                     channels: ('websocket' | 'sms' | 'email' | 'push')[];
                     quietHoursOverride: boolean;

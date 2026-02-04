@@ -5,7 +5,7 @@
  * Uses idempotency keys to ensure same event isn't notified twice.
  */
 
-import { redis, REDIS_KEYS, REDIS_TTL } from './client';
+import { redis, REDIS_KEYS } from './client';
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
 import { NotificationEventType } from '../types';

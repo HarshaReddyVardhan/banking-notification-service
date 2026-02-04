@@ -172,8 +172,8 @@ router.get(
         if (status) where['deliveryStatus'] = status;
         if (startDate || endDate) {
             where['createdAt'] = {};
-            if (startDate) (where['createdAt'] as Record<string, unknown>)[Op.gte] = new Date(startDate);
-            if (endDate) (where['createdAt'] as Record<string, unknown>)[Op.lte] = new Date(endDate);
+            if (startDate) (where['createdAt'] as any)[Op.gte] = new Date(startDate);
+            if (endDate) (where['createdAt'] as any)[Op.lte] = new Date(endDate);
         }
 
         const offset = (page - 1) * limit;

@@ -5,9 +5,9 @@
  * Latency target: <50ms for immediate user feedback.
  */
 
-import { config } from '../../config/config';
-import { logger, logChannelDelivery } from '../../utils/logger';
-import { WebSocketPayload, DeliveryResult, NotificationPayload } from '../../types';
+import { config } from '../config/config';
+import { logger, logChannelDelivery } from '../utils/logger';
+import { WebSocketPayload, DeliveryResult, NotificationPayload } from '../types';
 
 export interface WebSocketGatewayResponse {
     success: boolean;

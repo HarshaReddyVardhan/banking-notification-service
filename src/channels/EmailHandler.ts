@@ -5,10 +5,10 @@
  * Supports templates, HTML content, and digest batching.
  */
 
-import sgMail, { MailDataRequired } from '@sendgrid/mail';
-import { config } from '../../config/config';
-import { logger, logChannelDelivery } from '../../utils/logger';
-import { EmailPayload, DeliveryResult, NotificationPayload } from '../../types';
+import sgMail from '@sendgrid/mail';
+import { config } from '../config/config';
+import { logger, logChannelDelivery } from '../utils/logger';
+import { EmailPayload, DeliveryResult, NotificationPayload } from '../types';
 
 export class EmailHandler {
     private enabled: boolean;
@@ -113,7 +113,7 @@ export class EmailHandler {
         }
 
         try {
-            const msg: MailDataRequired = {
+            const msg: any = {
                 to: {
                     email: payload.to,
                     name: payload.toName,
@@ -172,7 +172,7 @@ export class EmailHandler {
         const subject = this.getDigestSubject(frequency);
 
         try {
-            const msg: MailDataRequired = {
+            const msg: any = {
                 to: {
                     email: toEmail,
                     name: toName,
@@ -234,8 +234,8 @@ export class EmailHandler {
         toEmail: string,
         toName: string | undefined,
         notification: NotificationPayload
-    ): MailDataRequired {
-        const msg: MailDataRequired = {
+    ): any {
+        const msg: any = {
             to: {
                 email: toEmail,
                 name: toName,
@@ -293,7 +293,7 @@ export class EmailHandler {
      * Build HTML email content
      */
     private buildHtmlContent(notification: NotificationPayload): string {
-        const actionsHtml = notification.actions?.map((a) =>
+        const actionsHtml = notification.actions?.map((a: any) =>
             `<a href="${a.url}" style="display:inline-block;padding:10px 20px;background:#0066cc;color:#fff;text-decoration:none;border-radius:5px;margin:5px;">${a.label}</a>`
         ).join('') ?? '';
 

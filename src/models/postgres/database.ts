@@ -5,8 +5,8 @@
  */
 
 import { Sequelize, Options } from 'sequelize';
-import { config } from '../config/config';
-import { logger } from '../utils/logger';
+import { config } from '../../config/config';
+import { logger } from '../../utils/logger';
 
 // Build connection options
 const sequelizeOptions: Options = {
